@@ -26,8 +26,8 @@ ECHO=@echo
 
 PLATFORM := xilinx_u250_gen3x16_xdma_4_1_202210_1
 DEVICE := xcu250-figd2104-2L-e
-TARGET := hw_emu
-KERNEL := thomas_forward
+TARGET := sw_emu
+KERNEL := broadcast_x3
 	
 help:
 	$(ECHO) "Makefile Usage:"
