@@ -1,33 +1,29 @@
-#include "stream_small_constant.hpp"
+#include "naive_mem2stream.hpp"
 
 #include <iostream>
 
 int main(int argc, char *argv[]) {
     // Create test inputs.
-    const uint32_t NS = 5;
-    const uint32_t NV = 10;
-    const uint32_t N = NS * NV;
+    const uint32_t N = 100;
 
-    double input[NS];
-    for (uint32_t i = 0; i < NS; i++) {
+    ap_uint<64> input[N];
+    for (uint32_t i = 0; i < N; i++) {
         input[i] = i * i;
     }
 
     // Create correct (golden) outputs.
-    double golden_output[N];
-    for (uint32_t i = 0; i < NS; i++) {
-        for (uint32_t j = 0; j < NV; j++) {
-            golden_output[i * NV + j] = input[i];
-        }
+    ap_uint<64> golden_output[N];
+    for (uint32_t i = 0; i < N; i++) {
+        golden_output[i] = input[i];
     }
 
-    hls::stream<double> output_stream;
+    hls::stream<ap_uint<64>> output_stream;
 
     // Run the kernel as a C++ function.
-    stream_small_constant(input, output_stream, NV, NS);
+    naive_mem2stream(input, output_stream, N);
 
     // Read the outputs from the stream.
-    double output[N];
+    ap_uint<64> output[N];
     for (uint32_t words_read = 0; words_read < N; words_read++) {
         output[words_read] = output_stream.read();
     }

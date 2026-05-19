@@ -10,18 +10,18 @@ int main(int argc, char *argv[]) {
     const uint32_t N = num_lines_per_group * GROUP_SIZE * line_length;
     const uint32_t reduced_N = num_lines_per_group * GROUP_SIZE * (line_length-1);
 
-    double density_pe[N];
+    ap_uint<64> density_pe[N];
     for (uint32_t i = 0; i < N; i++) {
         density_pe[i] = i * i;
     }
 
-    hls::stream<double> from_pe_x3;
+    hls::stream<ap_uint<64>> from_pe_x3;
     for (uint32_t i = 0; i < N; i++) {
         from_pe_x3.write(density_pe[i]);
     }
 
     // Create correct (golden) outputs.
-    double golden_loopback[reduced_N];
+    ap_uint<64> golden_loopback[reduced_N];
     int addr = 0;
     for (uint32_t i = 0; i < num_lines_per_group; i++) {
         for (uint32_t j = 0; j < line_length-1; j++) {
@@ -31,21 +31,21 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    double golden_intermediate[N];
-    memcpy(golden_intermediate, density_pe, sizeof(double)*N);
+    ap_uint<64> golden_intermediate[N];
+    memcpy(golden_intermediate, density_pe, sizeof(ap_uint<64>)*N);
 
-    hls::stream<double> density_loopback;
-    hls::stream<double> density_intermediate;
+    hls::stream<ap_uint<64>> density_loopback;
+    hls::stream<ap_uint<64>> density_intermediate;
 
     // Run the kernel as a C++ function.
     broadcast_x3(from_pe_x3, density_loopback, density_intermediate, line_length, num_lines_per_group);
 
     // Read the outputs from the stream.
-    double loopback[reduced_N];
+    ap_uint<64> loopback[reduced_N];
     for (uint32_t words_read = 0; words_read < reduced_N; words_read++) {
         loopback[words_read] = density_loopback.read();
     }
-    double intermediate[N];
+    ap_uint<64> intermediate[N];
     for (uint32_t words_read = 0; words_read < N; words_read++) {
         intermediate[words_read] = density_intermediate.read();
     }

@@ -1,11 +1,11 @@
-#include "stream_small_constant.hpp"
+#include "stream_constant1.hpp"
 #include "defines.hpp"
 
 extern "C" {
 
-void stream_small_constant(
-  double *mem,
-  hls::stream<double> &stream,
+void stream_constant1(
+  ap_uint<64> *mem,
+  hls::stream<ap_uint<64>> &stream,
   int NV,
   int NS
 ) {
@@ -16,10 +16,10 @@ void stream_small_constant(
 #pragma HLS INTERFACE s_axilite port=NS bundle=control
 #pragma HLS INTERFACE s_axilite port=return bundle=control
 
-  double local_constant[MAX_S];
+  ap_uint<64> local_constant[MAX_S];
 #pragma HLS BIND_STORAGE variable=local_constant type=ram_1p impl=lutram
 
-  memcpy(local_constant, mem, sizeof(double)*NS);
+  memcpy(local_constant, mem, sizeof(ap_uint<64>)*NS);
 
   int base_addr = 0;
   for (int i=0; i < NS; ++i) {

@@ -10,26 +10,26 @@ int main(int argc, char *argv[]) {
     const uint32_t N = num_lines_per_group * GROUP_SIZE * line_length;
     const uint32_t reduced_N = num_lines_per_group * GROUP_SIZE * (line_length-1);
 
-    double density_ddr[N];
+    ap_uint<64> density_ddr[N];
     for (uint32_t i = 0; i < N; i++) {
         density_ddr[i] = i * i;
     }
-    double density_pe[reduced_N];
+    ap_uint<64> density_pe[reduced_N];
     for (uint32_t i = 0; i < reduced_N; i++) {
         density_pe[i] = i * 5;
     }
 
-    hls::stream<double> density_from_ddr;
+    hls::stream<ap_uint<64>> density_from_ddr;
     for (uint32_t i = 0; i < N; i++) {
         density_from_ddr.write(density_ddr[i]);
     }
-    hls::stream<double> density_from_pe;
+    hls::stream<ap_uint<64>> density_from_pe;
     for (uint32_t i = 0; i < reduced_N; i++) {
         density_from_pe.write(density_pe[i]);
     }
 
     // Create correct (golden) outputs.
-    double golden_x1[N];
+    ap_uint<64> golden_x1[N];
     int addr = 0;
     for (uint32_t i = 0; i < num_lines_per_group; i++) {
         for (uint32_t k = 0; k < GROUP_SIZE; k++) {
@@ -44,18 +44,18 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    double golden_x2[N];
-    memcpy(golden_x2, density_ddr, sizeof(double)*N);
+    ap_uint<64> golden_x2[N];
+    memcpy(golden_x2, density_ddr, sizeof(ap_uint<64>)*N);
 
-    hls::stream<double> to_pe_x1;
-    hls::stream<double> to_pe_x2;
+    hls::stream<ap_uint<64>> to_pe_x1;
+    hls::stream<ap_uint<64>> to_pe_x2;
 
     // Run the kernel as a C++ function.
     feed_forward_pe(density_from_ddr, density_from_pe, to_pe_x1, to_pe_x2, line_length, num_lines_per_group);
 
     // Read the outputs from the stream.
-    double x1[N];
-    double x2[N];
+    ap_uint<64> x1[N];
+    ap_uint<64> x2[N];
     for (uint32_t words_read = 0; words_read < N; words_read++) {
         x1[words_read] = to_pe_x1.read();
         x2[words_read] = to_pe_x2.read();

@@ -4,10 +4,10 @@
 extern "C" {
 
 void feed_forward_pe(
-  hls::stream<double> &density_from_ddr, // round-robin over GROUP_SIZE lines
-  hls::stream<double> &density_from_pe, // loopback from forward_pe, same order as ddr stream
-  hls::stream<double> &to_pe_x1,
-  hls::stream<double> &to_pe_x2,
+  hls::stream<ap_uint<64>> &density_from_ddr, // round-robin over GROUP_SIZE lines
+  hls::stream<ap_uint<64>> &density_from_pe, // loopback from forward_pe, same order as ddr stream
+  hls::stream<ap_uint<64>> &to_pe_x1,
+  hls::stream<ap_uint<64>> &to_pe_x2,
   int line_length,
   int num_lines_per_group
 ) {

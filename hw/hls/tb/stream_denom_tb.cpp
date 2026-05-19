@@ -1,4 +1,4 @@
-#include "stream_large_constant.hpp"
+#include "stream_denom.hpp"
 #include "defines.hpp"
 
 #include <iostream>
@@ -12,13 +12,13 @@ int main(int argc, char *argv[]) {
     const uint32_t N = NS * NV;
     const uint32_t size = NS * line_length;
 
-    double input[size];
+    ap_uint<64> input[size];
     for (uint32_t i = 0; i < size; i++) {
         input[i] = i * i;
     }
 
     // Create correct (golden) outputs.
-    double golden_output[N];
+    ap_uint<64> golden_output[N];
     int flat_idx = 0;
     for (uint32_t i = 0; i < NS; i++) {
         for (uint32_t j = 0; j < num_lines_per_S_group; j++) {
@@ -31,13 +31,13 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    hls::stream<double> output_stream;
+    hls::stream<ap_uint<64>> output_stream;
 
     // Run the kernel as a C++ function.
-    stream_large_constant(input, output_stream, line_length, num_lines_per_S_group, NS);
+    stream_denom(input, output_stream, line_length, num_lines_per_S_group, NS);
 
     // Read the outputs from the stream.
-    double output[N];
+    ap_uint<64> output[N];
     for (uint32_t words_read = 0; words_read < N; words_read++) {
         output[words_read] = output_stream.read();
     }

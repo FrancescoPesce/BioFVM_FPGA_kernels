@@ -4,12 +4,6 @@
 #define GROUP_SIZE 32
 
 #define MAX_DIM 1024
-#define MAX_S 8
-
-enum Dimension {
-  X,
-  Y,
-  Z
-}; 
+#define MAX_S 8 
 
 #endif // DEFINES_HPP

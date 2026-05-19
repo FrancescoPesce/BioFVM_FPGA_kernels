@@ -17,15 +17,15 @@ int main(int argc, char *argv[]) {
         c2_array[i] = i * 4;
     }
 
-    hls::stream<double> x1;
-    hls::stream<double> x2;
-    hls::stream<double> c1;
-    hls::stream<double> c2;
+    hls::stream<ap_uint<64>> x1;
+    hls::stream<ap_uint<64>> x2;
+    hls::stream<ap_uint<64>> c1;
+    hls::stream<ap_uint<64>> c2;
     for (uint32_t i = 0; i < size; i++) {
-        x1.write(x1_array[i]);
-        x2.write(x2_array[i]);
-        c1.write(c1_array[i]);
-        c2.write(c2_array[i]);
+        x1.write(*reinterpret_cast<ap_uint<64>*>(&(x1_array[i])));
+        x2.write(*reinterpret_cast<ap_uint<64>*>(&(x2_array[i])));
+        c1.write(*reinterpret_cast<ap_uint<64>*>(&(c1_array[i])));
+        c2.write(*reinterpret_cast<ap_uint<64>*>(&(c2_array[i])));
     }
 
     // Create correct (golden) outputs.
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
         golden_output[i] = (x1_array[i] * c1_array[i] + x2_array[i]) * c2_array[i];
     }
 
-    hls::stream<double> x3;
+    hls::stream<ap_uint<64>> x3;
 
     // Run the kernel as a C++ function.
     forward_pe(x1, x2, c1, c2, x3, size);
@@ -42,7 +42,8 @@ int main(int argc, char *argv[]) {
     // Read the outputs from the stream.
     double output[size];
     for (uint32_t words_read = 0; words_read < size; words_read++) {
-        output[words_read] = x3.read();
+        ap_uint<64> temp = x3.read();
+        output[words_read] = *reinterpret_cast<double*>(&temp);
     }
 
     // Check the results.
