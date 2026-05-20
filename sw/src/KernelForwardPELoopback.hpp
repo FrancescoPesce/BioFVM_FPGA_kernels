@@ -1,14 +1,14 @@
-#ifndef KERNEL_BROADCAST_X3_HPP
-#define KERNEL_BROADCAST_X3_HPP
+#ifndef KERNEL_FORWARD_PE_LOOPBACK_HPP
+#define KERNEL_FORWARD_PE_LOOPBACK_HPP
 
 #include <string>
 #include "experimental/xrt_kernel.h"
 #include "experimental/xrt_uuid.h"
 
-class KernelBroadcastX3 {
+class KernelForwardPELoopback {
     public:
         // Create XRT objects for device, kernel and run.
-        KernelBroadcastX3(xrt::device device, xrt::uuid xclbin_uuid)
+        KernelForwardPELoopback(xrt::device device, xrt::uuid xclbin_uuid)
             : device(device) {
             // Create kernel object from the xclbin.
             krnl = xrt::kernel(device, xclbin_uuid, kernel_name.c_str());
@@ -36,7 +36,7 @@ class KernelBroadcastX3 {
 
     private:
         // Name of the kernel, must match the name chosen in hw.
-        inline static const std::string kernel_name = "broadcast_x3";
+        inline static const std::string kernel_name = "forward_pe_loopback";
 
         // Indices of kernel arguments, must match the order in hw.
         static constexpr int arg_line_length         = 3;
@@ -49,4 +49,4 @@ class KernelBroadcastX3 {
         xrt::run run;
 };
 
-#endif // KERNEL_BROADCAST_X3_HPP
+#endif // KERNEL_FORWARD_PE_LOOPBACK_HPP

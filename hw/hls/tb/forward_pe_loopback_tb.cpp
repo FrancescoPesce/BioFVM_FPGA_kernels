@@ -1,4 +1,4 @@
-#include "broadcast_x3.hpp"
+#include "forward_pe_loopback.hpp"
 #include "defines.hpp"
 
 #include <iostream>
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
     hls::stream<ap_uint<64>> density_intermediate;
 
     // Run the kernel as a C++ function.
-    broadcast_x3(from_pe_x3, density_loopback, density_intermediate, line_length, num_lines_per_group);
+    forward_pe_loopback(from_pe_x3, density_loopback, density_intermediate, line_length, num_lines_per_group);
 
     // Read the outputs from the stream.
     ap_uint<64> loopback[N];

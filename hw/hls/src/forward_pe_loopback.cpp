@@ -1,9 +1,9 @@
-#include "broadcast_x3.hpp"
+#include "forward_pe_loopback.hpp"
 #include "defines.hpp"
 
 extern "C" {
 
-void broadcast_x3(
+void forward_pe_loopback(
   hls::stream<ap_uint<64>> &from_pe_x3,
   hls::stream<ap_uint<64>> &density_loopback,
   hls::stream<ap_uint<64>> &density_intermediate, // round-robin over GROUP_SIZE lines
@@ -28,39 +28,27 @@ void broadcast_x3(
 
   // Main loop: copy x3 to both loopback and intermediate, 
   // write 0 into loopback for the final GROUP_SIZE entries in each line for the next iteration
-  for (int i=0; i < num_lines_per_group - 1; ++i) {
-    for (int j=0; j < line_length - 1; ++j) {
+  // At the last iteration, do not write 0s into the loopback
+  for (int i=0; i < num_lines_per_group; ++i) {
+    for (int j=0; j < line_length; ++j) {
 #pragma HLS PIPELINE II=GROUP_SIZE
       for (int k=0; k < GROUP_SIZE; ++k) {
 #pragma HLS PIPELINE II=1
-        ap_uint<64> val = from_pe_x3.read();
-        density_loopback.write(val);
-        density_intermediate.write(val);
+        ap_uint<64> val1 = from_pe_x3.read();
+        density_intermediate.write(val1);
+
+        ap_uint<64> val2;
+        if (j != (line_length-1)) {
+          val2 = val1;
+        } else {
+          conv.d = 0.0;
+          val2 = conv.u;
+        }
+        if ((i != (num_lines_per_group-1)) || (j != (line_length-1))) {
+          density_loopback.write(val2);
+        }
       }
     }
-
-    for (int k=0; k < GROUP_SIZE; ++k) {
-#pragma HLS PIPELINE II=1
-      conv.d = 0.0;
-      density_loopback.write(conv.u);
-      density_intermediate.write(from_pe_x3.read());
-    }
-  }
-
-  // At the last iteration, do not write 0s into the loopback
-  for (int j=0; j < line_length - 1; ++j) {
-#pragma HLS PIPELINE II=GROUP_SIZE
-    for (int k=0; k < GROUP_SIZE; ++k) {
-#pragma HLS PIPELINE II=1
-      ap_uint<64> val = from_pe_x3.read();
-      density_loopback.write(val);
-      density_intermediate.write(val);
-    }
-  }
-
-  for (int k=0; k < GROUP_SIZE; ++k) {
-#pragma HLS PIPELINE II=1
-    density_intermediate.write(from_pe_x3.read());
   }
 }
 
