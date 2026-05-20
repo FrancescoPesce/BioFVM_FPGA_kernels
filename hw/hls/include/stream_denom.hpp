@@ -7,6 +7,9 @@
 #include <ap_int.h>
 
 extern "C" {
+// Save NS * line_length denom values to cache,
+// stream each line num_lines_per_S_group * GROUP_SIZE times,
+// then change to the next S, for NS times
 void stream_denom(
   ap_uint<64> *mem,
   hls::stream<ap_uint<64>> &stream,

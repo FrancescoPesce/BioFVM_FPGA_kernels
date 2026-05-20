@@ -6,6 +6,9 @@
 #include <ap_int.h>
 
 extern "C" {
+// Broadcast the output of forward_pe (from_pe_x3) to 
+// - the rest of the computation (density_intermediate): full stream 
+// - feed_forward_pe (density_loopback): remove last GROUP_SIZE values of each line
 void broadcast_x3(
   hls::stream<ap_uint<64>> &from_pe_x3,
   hls::stream<ap_uint<64>> &density_loopback,

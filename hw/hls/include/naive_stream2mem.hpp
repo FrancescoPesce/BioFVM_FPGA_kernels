@@ -6,6 +6,7 @@
 #include <ap_int.h>
 
 extern "C" {
+// Dump stream contents to memory for testing
 void naive_stream2mem(
   ap_uint<64> *mem,
   hls::stream<ap_uint<64>> &stream,

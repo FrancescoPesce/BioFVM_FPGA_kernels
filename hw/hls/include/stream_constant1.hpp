@@ -7,6 +7,7 @@
 #include <ap_int.h>
 
 extern "C" {
+// Save NS constant1 values to cache and stream each value NV times
 void stream_constant1(
   ap_uint<64> *mem,
   hls::stream<ap_uint<64>> &stream,

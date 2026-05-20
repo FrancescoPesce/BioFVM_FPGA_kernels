@@ -12,13 +12,14 @@ union u64_to_double {
   double d;
 };
 
+// Compute (x1 * c1 + x2) * c2
 void forward_pe(
   hls::stream<ap_uint<64>> &x1,
   hls::stream<ap_uint<64>> &x2,
   hls::stream<ap_uint<64>> &c1,
   hls::stream<ap_uint<64>> &c2,
   hls::stream<ap_uint<64>> &x3,
-  int len
+  int N
 );
 }
 
