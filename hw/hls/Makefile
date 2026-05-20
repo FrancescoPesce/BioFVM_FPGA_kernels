@@ -72,7 +72,7 @@ XO_TEST_EXE := build/$(TARGET)/$(KERNEL_TB_BASE)
 
 # Build the HLS kernel.
 # Use --optimize 3 to enable post-route optimizations. This may improve the bitstream but SIGNIFICANTLY increase compilation time
-$(KERNEL_XO): $(KERNEL_SRC) $(KERNEL_INC)
+$(KERNEL_XO): $(KERNEL_SRC) $(KERNEL_INC) $(DEFINES)
 	@mkdir -p build/$(TARGET)
 	cd build/$(TARGET); \
 		v++ $(XOCCFLAGS) --kernel $(KERNEL) -c -o $(KERNEL_XO_BASE) ../../$(KERNEL_SRC) $(INCFLGAS)

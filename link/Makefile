@@ -47,7 +47,6 @@ CONFIG     := xclbin_overlay.cfg
 
 XOS := 
 XOS += $(abspath ../hw/hls/build/$(TARGET)/broadcast_x3.xo)
-XOS += $(abspath ../hw/hls/build/$(TARGET)/feed_forward_pe.xo)
 XOS += $(abspath ../hw/hls/build/$(TARGET)/forward_pe.xo)
 XOS += $(abspath ../hw/hls/build/$(TARGET)/naive_mem2stream.xo)
 XOS += $(abspath ../hw/hls/build/$(TARGET)/naive_stream2mem.xo)

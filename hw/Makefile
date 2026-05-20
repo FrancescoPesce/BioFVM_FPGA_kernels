@@ -21,7 +21,6 @@ HLS_BUILD_COMMAND := $(MAKE) -C hls xo PLATFORM=$(PLATFORM) DEVICE=$(DEVICE) TAR
 
 hls:
 	$(HLS_BUILD_COMMAND) KERNEL=broadcast_x3
-	$(HLS_BUILD_COMMAND) KERNEL=feed_forward_pe
 	$(HLS_BUILD_COMMAND) KERNEL=forward_pe
 	$(HLS_BUILD_COMMAND) KERNEL=naive_mem2stream
 	$(HLS_BUILD_COMMAND) KERNEL=naive_stream2mem

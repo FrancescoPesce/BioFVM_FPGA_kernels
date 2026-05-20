@@ -1,6 +1,5 @@
 #include <ap_int.h>
 #include "KernelBroadcastX3.hpp"
-#include "KernelFeedForwardPE.hpp"
 #include "KernelForwardPE.hpp"
 #include "KernelMem2Stream.hpp"
 #include "KernelStream2Mem.hpp"
@@ -64,7 +63,6 @@ int main(int argc, char* argv[]) {
     // 2. Set up the kernels (passthrough is free-running, so no need to do anything for it).
     std::cout << "Preparing the kernels" << std::endl;
     KernelBroadcastX3 broadcast_x3(device, xclbin_uuid);
-    KernelFeedForwardPE feed_forward_pe(device, xclbin_uuid);
     KernelForwardPE forward_pe(device, xclbin_uuid);
     KernelMem2Stream mem2stream(device, xclbin_uuid);
     KernelStream2Mem stream2mem(device, xclbin_uuid);
@@ -106,7 +104,6 @@ int main(int argc, char* argv[]) {
     // 5. Transfer data to the kernels.
     std::cout << "Transferring data to the kernels" << std::endl;
     broadcast_x3.set_inputs(line_length, num_lines_per_group);
-    feed_forward_pe.set_inputs(line_length, num_lines_per_group);
     forward_pe.set_inputs(N);
     mem2stream.set_inputs(original_density_uint, N);
     stream2mem.set_inputs(N);
@@ -116,7 +113,6 @@ int main(int argc, char* argv[]) {
     // 6. Launch the kernels.
     std::cout << "Launching the kernels" << std::endl;
     broadcast_x3.launch();
-    feed_forward_pe.launch();
     forward_pe.launch();
     mem2stream.launch();
     stream2mem.launch();
@@ -126,7 +122,6 @@ int main(int argc, char* argv[]) {
     // 6. Wait for the kernels to finish.
     std::cout << "Waiting for kernel runs to finish" << std::endl;
     broadcast_x3.wait_on_run();
-    feed_forward_pe.wait_on_run();
     forward_pe.wait_on_run();
     mem2stream.wait_on_run();
     stream2mem.wait_on_run();

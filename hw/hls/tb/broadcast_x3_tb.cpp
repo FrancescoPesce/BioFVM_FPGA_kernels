@@ -8,7 +8,6 @@ int main(int argc, char *argv[]) {
     const uint32_t line_length = 10;
     const uint32_t num_lines_per_group = 17;
     const uint32_t N = num_lines_per_group * GROUP_SIZE * line_length;
-    const uint32_t reduced_N = num_lines_per_group * GROUP_SIZE * (line_length-1);
 
     ap_uint<64> density_pe[N];
     for (uint32_t i = 0; i < N; i++) {
@@ -21,9 +20,14 @@ int main(int argc, char *argv[]) {
     }
 
     // Create correct (golden) outputs.
-    ap_uint<64> golden_loopback[reduced_N];
+    ap_uint<64> golden_loopback[N];
     int addr = 0;
     for (uint32_t i = 0; i < num_lines_per_group; i++) {
+        for (uint32_t k = 0; k < GROUP_SIZE; k++) {
+            golden_loopback[addr] = 0;
+            addr++;
+        }
+
         for (uint32_t j = 0; j < line_length-1; j++) {
             for (uint32_t k = 0; k < GROUP_SIZE; k++) {
                 golden_loopback[addr] = density_pe[i*GROUP_SIZE*line_length + j*GROUP_SIZE + k];
@@ -41,8 +45,8 @@ int main(int argc, char *argv[]) {
     broadcast_x3(from_pe_x3, density_loopback, density_intermediate, line_length, num_lines_per_group);
 
     // Read the outputs from the stream.
-    ap_uint<64> loopback[reduced_N];
-    for (uint32_t words_read = 0; words_read < reduced_N; words_read++) {
+    ap_uint<64> loopback[N];
+    for (uint32_t words_read = 0; words_read < N; words_read++) {
         loopback[words_read] = density_loopback.read();
     }
     ap_uint<64> intermediate[N];
@@ -52,13 +56,11 @@ int main(int argc, char *argv[]) {
 
     // Check the results.
     bool pass = true;
-    for (uint32_t i = 0; i < reduced_N; i++) {
+    for (uint32_t i = 0; i < N; i++) {
         if (loopback[i] != golden_loopback[i]) {
             std::cout << "loopback: Mismatch at index " << i << ": expected " << golden_loopback[i] << ", got " << loopback[i] << std::endl;
             pass = false;
         }
-    }
-    for (uint32_t i = 0; i < N; i++) {
         if (intermediate[i] != golden_intermediate[i]) {
             std::cout << "intermediate: Mismatch at index " << i << ": expected " << golden_intermediate[i] << ", got " << intermediate[i] << std::endl;
             pass = false;

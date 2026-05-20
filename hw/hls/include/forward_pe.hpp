@@ -6,12 +6,6 @@
 #include <ap_int.h>
 
 extern "C" {
-
-union u64_to_double {
-  ap_uint<64> u;
-  double d;
-};
-
 // Compute (x1 * c1 + x2) * c2
 void forward_pe(
   hls::stream<ap_uint<64>> &x1,

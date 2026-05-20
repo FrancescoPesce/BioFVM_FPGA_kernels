@@ -3,6 +3,7 @@
 
 #include <hls_stream.h>
 #include <stdint.h>
+#include <string.h>
 #include <ap_int.h>
 
 extern "C" {
