@@ -22,41 +22,57 @@
 
 ECHO=@echo
 
-.PHONY: all help
+.PHONY: help clean run build
 
-PLATFORM := xilinx_u250_gen3x16_xdma_4_1_202210_1
-DEVICE := xcu250-figd2104-2L-e
-TARGET := sw_emu
-FREQUENCY := 300
+TARGET=sw_emu
 
-XCLBIN  := overlay_$(TARGET).xclbin
-
-all: $(XCLBIN)
+all: build
 
 help:
 	$(ECHO) "Makefile Usage:"
 	$(ECHO) "  make all"
 	$(ECHO) ""
+	$(ECHO) "  make run"
+	$(ECHO) "      Run the application."
+	$(ECHO) ""
 	$(ECHO) "  make clean"
 	$(ECHO) "      Remove all the generated files."
 	$(ECHO) ""
 
-# Use --optimize 3 to enable post-route optimizations. This may improve the bitstream but SIGNIFICANTLY increase compilation time
-XOCCLFLAGS := --kernel_frequency $(FREQUENCY) -s -g
-CONFIG     := xclbin_overlay.cfg
+################## software build for XRT Native API code
+CXXFLAGS := -std=c++17 -Wno-deprecated-declarations
+CXXFLAGS += -I$(XILINX_XRT)/include -I$(XILINX_HLS)/include
 
-XOS := 
-XOS += $(abspath ../../../hw/hls/build/$(TARGET)/forward_pe.xo)
-XOS += $(abspath ../../../hw/hls/build/$(TARGET)/pe_loopback.xo)
-XOS += $(abspath ../../../hw/hls/build/$(TARGET)/naive_mem2stream.xo)
-XOS += $(abspath ../../../hw/hls/build/$(TARGET)/naive_stream2mem.xo)
-XOS += $(abspath ../../../hw/hls/build/$(TARGET)/stream_constant1.xo)
-XOS += $(abspath ../../../hw/hls/build/$(TARGET)/stream_denom.xo)
+LDFLAGS := -L$(XILINX_XRT)/lib
+LDFLAGS += $(LDFLAGS) -lxrt_coreutil -luuid
 
-$(XCLBIN): $(XOS)
-	mkdir -p build
-	cd build; \
-		v++ -l $(XOCCLFLAGS) --config ../$(CONFIG) -t $(TARGET) -f $(PLATFORM) $(XOS) -o $(XCLBIN)
+# You can use them for including something. For example, opencv
+#LIBS = `pkg-config --libs opencv`
+#CFLAGS = `pkg-config --cflags opencv`
 
+EXECUTABLE := host_$(TARGET)
+OVERLAY	   := overlay_$(TARGET).xclbin
+
+HOST_SRCS := src/*.cpp
+HOST_INCLUDES := src/*.hpp
+
+build: build/$(EXECUTABLE)
+
+# Eventually add LIBS and CFLAGS
+build/$(EXECUTABLE): $(HOST_SRCS) $(HOST_INCLUDES)
+	@mkdir -p build
+	$(CXX) -o build/$(EXECUTABLE) $(HOST_SRCS) $(CXXFLAGS) $(LDFLAGS) 
+
+build/xrt.ini:
+	@mkdir -p build
+	@cp xrt.ini build/xrt.ini
+
+################## run
+run: build/$(EXECUTABLE) ../link/build/$(OVERLAY) build/xrt.ini
+	export XCL_EMULATION_MODE=$(TARGET); \
+		cd build; \
+		./$(EXECUTABLE) ../../link/build/$(OVERLAY)
+
+################## clean up
 clean:
-	$(RM) -rf build
+	$(RM) -r build

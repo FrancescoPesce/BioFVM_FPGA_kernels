@@ -1,8 +1,9 @@
 ECHO=@echo
 
 .PHONY: help clean hls all \
+		backward_pe \
         forward_pe \
-        forward_pe_loopback \
+        pe_loopback \
         naive_mem2stream \
         naive_stream2mem \
         stream_constant1 \
@@ -29,18 +30,22 @@ HLS_BUILD_COMMAND = $(MAKE) -C hls xo \
 	TARGET=$(TARGET)
 
 hls: \
+	backward_pe \
 	forward_pe \
-	forward_pe_loopback \
+	pe_loopback \
 	naive_mem2stream \
 	naive_stream2mem \
 	stream_constant1 \
 	stream_denom
 
+backward_pe:
+	$(HLS_BUILD_COMMAND) KERNEL=backward_pe
+
 forward_pe:
 	$(HLS_BUILD_COMMAND) KERNEL=forward_pe
 
-forward_pe_loopback:
-	$(HLS_BUILD_COMMAND) KERNEL=forward_pe_loopback
+pe_loopback:
+	$(HLS_BUILD_COMMAND) KERNEL=pe_loopback
 
 naive_mem2stream:
 	$(HLS_BUILD_COMMAND) KERNEL=naive_mem2stream

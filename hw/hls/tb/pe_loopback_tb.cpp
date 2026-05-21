@@ -1,4 +1,4 @@
-#include "forward_pe_loopback.hpp"
+#include "pe_loopback.hpp"
 #include "defines.hpp"
 
 #include <iostream>
@@ -35,23 +35,23 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    ap_uint<64> golden_intermediate[N];
-    memcpy(golden_intermediate, density_pe, sizeof(ap_uint<64>)*N);
+    ap_uint<64> golden_output[N];
+    memcpy(golden_output, density_pe, sizeof(ap_uint<64>)*N);
 
     hls::stream<ap_uint<64>> density_loopback;
-    hls::stream<ap_uint<64>> density_intermediate;
+    hls::stream<ap_uint<64>> density_output;
 
     // Run the kernel as a C++ function.
-    forward_pe_loopback(from_pe_x3, density_loopback, density_intermediate, line_length, num_lines_per_group);
+    pe_loopback(from_pe_x3, density_loopback, density_output, line_length, num_lines_per_group);
 
     // Read the outputs from the stream.
     ap_uint<64> loopback[N];
     for (uint32_t words_read = 0; words_read < N; words_read++) {
         loopback[words_read] = density_loopback.read();
     }
-    ap_uint<64> intermediate[N];
+    ap_uint<64> output[N];
     for (uint32_t words_read = 0; words_read < N; words_read++) {
-        intermediate[words_read] = density_intermediate.read();
+        output[words_read] = density_output.read();
     }
 
     // Check the results.
@@ -61,8 +61,8 @@ int main(int argc, char *argv[]) {
             std::cout << "loopback: Mismatch at index " << i << ": expected " << golden_loopback[i] << ", got " << loopback[i] << std::endl;
             pass = false;
         }
-        if (intermediate[i] != golden_intermediate[i]) {
-            std::cout << "intermediate: Mismatch at index " << i << ": expected " << golden_intermediate[i] << ", got " << intermediate[i] << std::endl;
+        if (output[i] != golden_output[i]) {
+            std::cout << "output: Mismatch at index " << i << ": expected " << golden_output[i] << ", got " << output[i] << std::endl;
             pass = false;
         }
     }
