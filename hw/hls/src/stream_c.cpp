@@ -26,7 +26,7 @@ void stream_c(
   int base_addr = 0;
   for (int i=0; i < NS; ++i) {
     for (int j=0; j < num_lines_per_S_group; ++j) {
-      for (int k=0; k < line_length; ++k) {
+      for (int k=line_length-1; k >= 0; --k) {
         for (int l=0; l < GROUP_SIZE; ++l) {
 #pragma HLS PIPELINE II=1
           stream.write(local_constant[base_addr + k]);

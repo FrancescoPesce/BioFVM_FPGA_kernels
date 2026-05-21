@@ -28,7 +28,7 @@ void compute_golden_output(double* input, double* c, double* golden_output, int 
                 double previous_output = 0.0;
                 for (uint32_t j = 0; j < line_length; j++) {
                     int addr = base_addr + j * GROUP_SIZE + k;
-                    golden_output[addr] = input[addr] - previous_output * c[s * line_length + j];
+                    golden_output[addr] = input[addr] - previous_output * c[s * line_length + line_length-j-1];
                     previous_output = golden_output[addr];
                 }
             }
@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
     }
 
     constexpr int device_id = 0;
-    std::cout << "1. Loading bitstream (" << xclbin_file << ") on device " << device_id << "... ";
+    std::cout << "Loading bitstream (" << xclbin_file << ") on device " << device_id << "... ";
     xrt::device device = xrt::device(device_id);
     xrt::uuid xclbin_uuid = device.load_xclbin(xclbin_file);
 

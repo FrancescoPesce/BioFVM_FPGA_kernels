@@ -1,9 +1,12 @@
 #ifndef DEFINES_HPP
 #define DEFINES_HPP
 
-#define GROUP_SIZE 32
+#define LOG_GROUP_SIZE 5
+#define GROUP_SIZE (1 << LOG_GROUP_SIZE)
+#define GROUP_OFFSET_MASK (GROUP_SIZE-1)
 
-#define MAX_DIM 2048
+#define LOG_MAX_DIM 11
+#define MAX_DIM (1 << LOG_MAX_DIM)
 #define MAX_S 8
 
 union u64_to_double {
