@@ -46,12 +46,12 @@ XOCCLFLAGS := --kernel_frequency $(FREQUENCY) -s -g
 CONFIG     := xclbin_overlay.cfg
 
 XOS := 
-XOS += $(abspath ../hw/hls/build/$(TARGET)/forward_pe.xo)
-XOS += $(abspath ../hw/hls/build/$(TARGET)/forward_pe_loopback.xo)
-XOS += $(abspath ../hw/hls/build/$(TARGET)/naive_mem2stream.xo)
-XOS += $(abspath ../hw/hls/build/$(TARGET)/naive_stream2mem.xo)
-XOS += $(abspath ../hw/hls/build/$(TARGET)/stream_constant1.xo)
-XOS += $(abspath ../hw/hls/build/$(TARGET)/stream_denom.xo)
+XOS += $(abspath ../../../hw/hls/build/$(TARGET)/forward_pe.xo)
+XOS += $(abspath ../../../hw/hls/build/$(TARGET)/forward_pe_loopback.xo)
+XOS += $(abspath ../../../hw/hls/build/$(TARGET)/naive_mem2stream.xo)
+XOS += $(abspath ../../../hw/hls/build/$(TARGET)/naive_stream2mem.xo)
+XOS += $(abspath ../../../hw/hls/build/$(TARGET)/stream_constant1.xo)
+XOS += $(abspath ../../../hw/hls/build/$(TARGET)/stream_denom.xo)
 
 $(XCLBIN): $(XOS)
 	mkdir -p build

@@ -21,7 +21,7 @@ sw:
 	$(MAKE) -C sw
 
 hw:
-	$(MAKE) -C hw -j PLATFORM=$(PLATFORM) DEVICE=$(DEVICE) TARGET=$(TARGET)
+	$(MAKE) -C ../../hw -j PLATFORM=$(PLATFORM) DEVICE=$(DEVICE) TARGET=$(TARGET)
 	
 link:
 	$(MAKE) -C link
