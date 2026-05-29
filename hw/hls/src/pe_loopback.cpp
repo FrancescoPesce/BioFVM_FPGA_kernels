@@ -1,12 +1,11 @@
 #include "pe_loopback.hpp"
-#include "defines.hpp"
 
 extern "C" {
 
 void pe_loopback(
-  hls::stream<ap_uint<64>> &from_pe_x3,
-  hls::stream<ap_uint<64>> &density_loopback,
-  hls::stream<ap_uint<64>> &density_output, // round-robin over GROUP_SIZE lines
+  hls::stream<ap_uint<REAL_WIDTH>> &from_pe_x3,
+  hls::stream<ap_uint<REAL_WIDTH>> &density_loopback,
+  hls::stream<ap_uint<REAL_WIDTH>> &density_output, // round-robin over GROUP_SIZE lines
   int line_length,
   int num_lines_per_group
 ) {
@@ -17,7 +16,7 @@ void pe_loopback(
 #pragma HLS INTERFACE s_axilite port=num_lines_per_group bundle=control
 #pragma HLS INTERFACE s_axilite port=return bundle=control
 
-  u64_to_double conv = {0};
+  uREAL_WIDTH_to_real_t conv = {0};
 
   // Initialize loopback with one 0 per line
   for (int k=0; k < GROUP_SIZE; ++k) {
@@ -34,10 +33,10 @@ void pe_loopback(
 #pragma HLS PIPELINE II=GROUP_SIZE
       for (int k=0; k < GROUP_SIZE; ++k) {
 #pragma HLS PIPELINE II=1
-        ap_uint<64> val1 = from_pe_x3.read();
+        ap_uint<REAL_WIDTH> val1 = from_pe_x3.read();
         density_output.write(val1);
 
-        ap_uint<64> val2;
+        ap_uint<REAL_WIDTH> val2;
         if (j != (line_length-1)) {
           val2 = val1;
         } else {

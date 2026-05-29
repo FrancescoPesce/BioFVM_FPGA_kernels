@@ -6,23 +6,23 @@ int main(int argc, char *argv[]) {
     // Create test inputs.
     const uint32_t N = 1024;
 
-    ap_uint<64> input[N];
+    ap_uint<REAL_WIDTH> input[N];
     for (uint32_t i = 0; i < N; i++) {
         input[i] = i * i;
     }
 
     // Create correct (golden) outputs.
-    ap_uint<64> golden_output[N];
+    ap_uint<REAL_WIDTH> golden_output[N];
     for (uint32_t i = 0; i < N; i++) {
         golden_output[i] = input[i];
     }
 
-    hls::stream<ap_uint<64>> input_stream;
+    hls::stream<ap_uint<REAL_WIDTH>> input_stream;
     for (uint32_t i = 0; i < N; i++) {
         input_stream.write(input[i]);
     }
 
-    ap_uint<64> output[N];
+    ap_uint<REAL_WIDTH> output[N];
 
     // Run the kernel as a C++ function.
     naive_stream2mem(output, input_stream, N);

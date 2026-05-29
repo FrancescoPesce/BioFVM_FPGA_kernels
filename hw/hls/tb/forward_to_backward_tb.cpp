@@ -1,5 +1,4 @@
 #include "forward_to_backward.hpp"
-#include "defines.hpp"
 
 #include <iostream>
 
@@ -9,18 +8,18 @@ int main(int argc, char *argv[]) {
     const uint32_t num_lines_per_group = 7;
     const uint32_t N = line_length * num_lines_per_group * GROUP_SIZE;
 
-    ap_uint<64> input[N];
+    ap_uint<REAL_WIDTH> input[N];
     for (uint32_t i = 0; i < N; i++) {
         input[i] = i;
     }
 
-    hls::stream<ap_uint<64>> input_stream;
+    hls::stream<ap_uint<REAL_WIDTH>> input_stream;
     for (uint32_t i = 0; i < N; i++) {
         input_stream.write(input[i]);
     }
 
     // Create correct (golden) outputs.
-    ap_uint<64> golden_output[N];
+    ap_uint<REAL_WIDTH> golden_output[N];
     for (uint32_t i = 0; i < num_lines_per_group; i++) {
         for (uint32_t j = 0; j < line_length; j++) {
             for (uint32_t k = 0; k < GROUP_SIZE; k++) {
@@ -29,13 +28,13 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    hls::stream<ap_uint<64>> output_stream;
+    hls::stream<ap_uint<REAL_WIDTH>> output_stream;
 
     // Run the kernel as a C++ function.
     forward_to_backward(input_stream, output_stream, line_length, num_lines_per_group);
 
     // Read the outputs from the stream.
-    ap_uint<64> output[N];
+    ap_uint<REAL_WIDTH> output[N];
     for (uint32_t words_read = 0; words_read < N; words_read++) {
         output[words_read] = output_stream.read();
     }

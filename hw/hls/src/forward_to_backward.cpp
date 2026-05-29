@@ -1,12 +1,10 @@
 #include "forward_to_backward.hpp"
-#include "defines.hpp"
-#include "stdio.h"
 
 extern "C" {
 
 void forward_to_backward(
-  hls::stream<ap_uint<64>> &density_forward,
-  hls::stream<ap_uint<64>> &density_backward,
+  hls::stream<ap_uint<REAL_WIDTH>> &density_forward,
+  hls::stream<ap_uint<REAL_WIDTH>> &density_backward,
   int line_length,
   int num_lines_per_group
 ) {
@@ -16,7 +14,7 @@ void forward_to_backward(
 #pragma HLS INTERFACE s_axilite port=num_lines_per_group bundle=control
 #pragma HLS INTERFACE s_axilite port=return bundle=control
 
-  ap_uint<64> buffer[GROUP_SIZE*(MAX_DIM+1)];
+  ap_uint<REAL_WIDTH> buffer[GROUP_SIZE*(MAX_DIM+1)];
 #pragma HLS BIND_STORAGE variable=buffer type=ram_t2p impl=uram
 
   // Initialize the buffer writing the first GROUP_SIZE lines

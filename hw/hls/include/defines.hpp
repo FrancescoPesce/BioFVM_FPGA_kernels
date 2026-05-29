@@ -9,9 +9,12 @@
 #define MAX_DIM (1 << LOG_MAX_DIM)
 #define MAX_S 8
 
-union u64_to_double {
-  ap_uint<64> u;
-  double d;
+typedef float real_t;
+#define REAL_WIDTH 32
+
+union unsigned_to_real {
+  ap_uint<REAL_WIDTH> u;
+  real_t r;
 };
 
 #endif // DEFINES_HPP

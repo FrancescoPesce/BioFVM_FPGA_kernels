@@ -19,12 +19,12 @@ class KernelStreamConstant1 {
         }
 
         // Set kernel arguments and write input data to the device.
-        void set_inputs(ap_uint<64>* input, int NV, int NS) {
+        void set_inputs(ap_uint<REAL_WIDTH>* input, int NV, int NS) {
             // Set banks for the input buffer.
             xrtMemoryGroup bank_input = krnl.group_id(arg_input);
 
             // Create the input buffer.
-            buf_in = xrt::bo(device, NS * 64 / 8, xrt::bo::flags::normal, bank_input);
+            buf_in = xrt::bo(device, NS * REAL_WIDTH / 8, xrt::bo::flags::normal, bank_input);
             
             // Set kernel arguments.
             run.set_arg(arg_input, buf_in);

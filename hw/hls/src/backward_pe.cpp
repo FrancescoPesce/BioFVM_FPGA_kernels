@@ -1,13 +1,12 @@
 #include "backward_pe.hpp"
-#include "defines.hpp"
 
 extern "C" {
 
 void backward_pe(
-  hls::stream<ap_uint<64>> &x1,
-  hls::stream<ap_uint<64>> &x2,
-  hls::stream<ap_uint<64>> &c,
-  hls::stream<ap_uint<64>> &x3,
+  hls::stream<ap_uint<REAL_WIDTH>> &x1,
+  hls::stream<ap_uint<REAL_WIDTH>> &x2,
+  hls::stream<ap_uint<REAL_WIDTH>> &c,
+  hls::stream<ap_uint<REAL_WIDTH>> &x3,
   int N
 ) {
 #pragma HLS INTERFACE axis port=x1
@@ -17,10 +16,10 @@ void backward_pe(
 #pragma HLS INTERFACE s_axilite port=N bundle=control
 #pragma HLS INTERFACE s_axilite port=return bundle=control
 
-  u64_to_double conv = {0};
+  unsigned_to_real conv = {0};
 
   bool vx1 = false, vx2 = false, vc = false;
-  ap_uint<64> bx1, bx2, bc;
+  ap_uint<REAL_WIDTH> bx1, bx2, bc;
 
   int i = 0;
   while (i < N) {
@@ -34,14 +33,14 @@ void backward_pe(
     // Only compute when full tuple is ready
     if (vx1 && vx2 && vc) {
 
-      conv.u = bx1; double x1_val = conv.d;
-      conv.u = bx2; double x2_val = conv.d;
-      conv.u = bc; double c_val = conv.d;
+      conv.u = bx1; real_t x1_val = conv.r;
+      conv.u = bx2; real_t x2_val = conv.r;
+      conv.u = bc; real_t c_val = conv.r;
 
-      double temp1 = x1_val * c_val;
-      double temp2 = x2_val - temp1;
+      real_t temp1 = x1_val * c_val;
+      real_t temp2 = x2_val - temp1;
 
-      conv.d = temp2;
+      conv.r = temp2;
       x3.write(conv.u);
 
       // Consume tuple

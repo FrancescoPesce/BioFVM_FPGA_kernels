@@ -1,5 +1,4 @@
 #include "pe_loopback.hpp"
-#include "defines.hpp"
 
 #include <iostream>
 
@@ -9,18 +8,18 @@ int main(int argc, char *argv[]) {
     const uint32_t num_lines_per_group = 17;
     const uint32_t N = num_lines_per_group * GROUP_SIZE * line_length;
 
-    ap_uint<64> density_pe[N];
+    ap_uint<REAL_WIDTH> density_pe[N];
     for (uint32_t i = 0; i < N; i++) {
         density_pe[i] = i * i;
     }
 
-    hls::stream<ap_uint<64>> from_pe_x3;
+    hls::stream<ap_uint<REAL_WIDTH>> from_pe_x3;
     for (uint32_t i = 0; i < N; i++) {
         from_pe_x3.write(density_pe[i]);
     }
 
     // Create correct (golden) outputs.
-    ap_uint<64> golden_loopback[N];
+    ap_uint<REAL_WIDTH> golden_loopback[N];
     int addr = 0;
     for (uint32_t i = 0; i < num_lines_per_group; i++) {
         for (uint32_t k = 0; k < GROUP_SIZE; k++) {
@@ -35,21 +34,21 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    ap_uint<64> golden_output[N];
-    memcpy(golden_output, density_pe, sizeof(ap_uint<64>)*N);
+    ap_uint<REAL_WIDTH> golden_output[N];
+    memcpy(golden_output, density_pe, sizeof(ap_uint<REAL_WIDTH>)*N);
 
-    hls::stream<ap_uint<64>> density_loopback;
-    hls::stream<ap_uint<64>> density_output;
+    hls::stream<ap_uint<REAL_WIDTH>> density_loopback;
+    hls::stream<ap_uint<REAL_WIDTH>> density_output;
 
     // Run the kernel as a C++ function.
     pe_loopback(from_pe_x3, density_loopback, density_output, line_length, num_lines_per_group);
 
     // Read the outputs from the stream.
-    ap_uint<64> loopback[N];
+    ap_uint<REAL_WIDTH> loopback[N];
     for (uint32_t words_read = 0; words_read < N; words_read++) {
         loopback[words_read] = density_loopback.read();
     }
-    ap_uint<64> output[N];
+    ap_uint<REAL_WIDTH> output[N];
     for (uint32_t words_read = 0; words_read < N; words_read++) {
         output[words_read] = density_output.read();
     }

@@ -7,7 +7,7 @@
 #include "utils.hpp"
 #include "../../../../hw/hls/include/defines.hpp"
 
-int check_result(double* golden_output, double* output, int size) {
+int check_result(real_t* golden_output, real_t* output, int size) {
     for (int i = 0; i < size; i++) {
         if (output[i] != (golden_output[i])) {
             std::cout << "Error at index " << i
@@ -20,12 +20,12 @@ int check_result(double* golden_output, double* output, int size) {
     return EXIT_SUCCESS;
 }
 
-void compute_golden_output(double* input, double* c, double* golden_output, int line_length, int num_lines_per_S_group, int NS) {
+void compute_golden_output(real_t* input, real_t* c, real_t* golden_output, int line_length, int num_lines_per_S_group, int NS) {
     int base_addr = 0;
     for (uint32_t s = 0; s < NS; s++) {
         for (uint32_t i = 0; i < num_lines_per_S_group; i++) {
             for (uint32_t k = 0; k < GROUP_SIZE; k++) {
-                double previous_output = 0.0;
+                real_t previous_output = 0.0;
                 for (uint32_t j = 0; j < line_length; j++) {
                     int addr = base_addr + j * GROUP_SIZE + k;
                     golden_output[addr] = input[addr] - previous_output * c[s * line_length + line_length-j-1];
@@ -78,8 +78,8 @@ int main(int argc, char* argv[]) {
     const int N = num_lines_per_S * NS * line_length;
     const int NV = N / NS;
 
-    double original_density[N];
-    double c[NS * line_length];
+    real_t original_density[N];
+    real_t c[NS * line_length];
     for (uint32_t i = 0; i < N; i++) {
         original_density[i] = i * i;
     }
@@ -87,11 +87,11 @@ int main(int argc, char* argv[]) {
         c[i] = i + 1;
     }
 
-    ap_uint<64>* original_density_uint = reinterpret_cast<ap_uint<64>*>(original_density);
-    ap_uint<64>* c_uint = reinterpret_cast<ap_uint<64>*>(c);
+    ap_uint<REAL_WIDTH>* original_density_uint = reinterpret_cast<ap_uint<REAL_WIDTH>*>(original_density);
+    ap_uint<REAL_WIDTH>* c_uint = reinterpret_cast<ap_uint<REAL_WIDTH>*>(c);
 
     // 4. Compute golden output.
-    double golden_density[N];
+    real_t golden_density[N];
     compute_golden_output(original_density, c, golden_density, line_length, num_lines_per_S_group, NS);
 
     // 5. Transfer data to the kernels.
@@ -120,8 +120,8 @@ int main(int argc, char* argv[]) {
     
     // 8. Transfer results from the kernel.
     std::cout << "Transferring results from the kernels" << std::endl;
-    double intermediate_density[N];
-    ap_uint<64>* intermediate_density_uint = reinterpret_cast<ap_uint<64>*>(intermediate_density);
+    real_t intermediate_density[N];
+    ap_uint<REAL_WIDTH>* intermediate_density_uint = reinterpret_cast<ap_uint<REAL_WIDTH>*>(intermediate_density);
     stream2mem.get_outputs(intermediate_density_uint);
 
     // 9. Check the results.

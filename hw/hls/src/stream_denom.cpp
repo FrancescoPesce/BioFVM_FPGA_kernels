@@ -1,11 +1,10 @@
 #include "stream_denom.hpp"
-#include "defines.hpp"
 
 extern "C" {
 
 void stream_denom(
-  ap_uint<64> *mem,
-  hls::stream<ap_uint<64>> &stream,
+  ap_uint<REAL_WIDTH> *mem,
+  hls::stream<ap_uint<REAL_WIDTH>> &stream,
   int line_length,
   int num_lines_per_S_group,
   int NS
@@ -18,10 +17,10 @@ void stream_denom(
 #pragma HLS INTERFACE s_axilite port=NS bundle=control
 #pragma HLS INTERFACE s_axilite port=return bundle=control
 
-  ap_uint<64> local_constant[MAX_S * MAX_DIM];
+  ap_uint<REAL_WIDTH> local_constant[MAX_S * MAX_DIM];
 #pragma HLS BIND_STORAGE variable=local_constant type=ram_1p impl=bram
 
-  memcpy(local_constant, mem, sizeof(ap_uint<64>)*NS*line_length);
+  memcpy(local_constant, mem, sizeof(ap_uint<REAL_WIDTH>)*NS*line_length);
 
   int base_addr = 0;
   for (int i=0; i < NS; ++i) {

@@ -24,7 +24,7 @@ class KernelStream2Mem {
             xrtMemoryGroup bank_output = krnl.group_id(arg_output);
 
             // Create the output buffer.
-            buf_out = xrt::bo(device, N * 64 / 8, xrt::bo::flags::normal, bank_output);
+            buf_out = xrt::bo(device, N * REAL_WIDTH / 8, xrt::bo::flags::normal, bank_output);
             
             // Set kernel arguments.
             run.set_arg(arg_output, buf_out);
@@ -32,7 +32,7 @@ class KernelStream2Mem {
         }
 
         // Get output data from the device.
-        void get_outputs(ap_uint<64>* output) {
+        void get_outputs(ap_uint<REAL_WIDTH>* output) {
             buf_out.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
             buf_out.read(output);
         }

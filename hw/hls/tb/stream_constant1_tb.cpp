@@ -8,26 +8,26 @@ int main(int argc, char *argv[]) {
     const uint32_t NV = 10;
     const uint32_t N = NS * NV;
 
-    ap_uint<64> input[NS];
+    ap_uint<REAL_WIDTH> input[NS];
     for (uint32_t i = 0; i < NS; i++) {
         input[i] = i * i;
     }
 
     // Create correct (golden) outputs.
-    ap_uint<64> golden_output[N];
+    ap_uint<REAL_WIDTH> golden_output[N];
     for (uint32_t i = 0; i < NS; i++) {
         for (uint32_t j = 0; j < NV; j++) {
             golden_output[i * NV + j] = input[i];
         }
     }
 
-    hls::stream<ap_uint<64>> output_stream;
+    hls::stream<ap_uint<REAL_WIDTH>> output_stream;
 
     // Run the kernel as a C++ function.
     stream_constant1(input, output_stream, NV, NS);
 
     // Read the outputs from the stream.
-    ap_uint<64> output[N];
+    ap_uint<REAL_WIDTH> output[N];
     for (uint32_t words_read = 0; words_read < N; words_read++) {
         output[words_read] = output_stream.read();
     }
